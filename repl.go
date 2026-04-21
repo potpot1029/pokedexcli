@@ -4,17 +4,19 @@ import (
 	"bufio"
 	"fmt"
 	"os"
-	"path"
-	"strconv"
 	"strings"
+
+	"github.com/potpot1029/pokedexcli/internal/pokeapi"
 )
 
-func startRepl() {
+type config struct {
+	pokeapiClient    pokeapi.Client
+	nextLocationsURL *string
+	prevLocationsURL *string
+}
+
+func startRepl(cfg *config) {
 	scanner := bufio.NewScanner(os.Stdin)
-	c := config{
-		Next:     baseURL + "/1",
-		Previous: "",
-	}
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -34,7 +36,7 @@ func startRepl() {
 			fmt.Println("Unknown command")
 		} else {
 			callback := command.callback
-			err := callback(&c)
+			err := callback(cfg)
 			if err != nil {
 				fmt.Printf("error running command: %v\n", err)
 			}
@@ -78,20 +80,4 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapBack,
 		},
 	}
-}
-
-type config struct {
-	Next     string
-	Previous string
-}
-
-const baseURL = "https://pokeapi.co/api/v2/location-area"
-
-func getNextURL(url string, step int) string {
-	id, err := strconv.Atoi(path.Base(url))
-	if err != nil {
-		fmt.Println(err)
-	}
-	id = id + step
-	return fmt.Sprintf("%s/%d", baseURL, id)
 }
