@@ -1,6 +1,6 @@
 # pokedexcli
 
-my implementation for "Build a Pokedex" project on [boot.dev](boot.dev).
+my implementation for "Build a Pokedex" project on [boot.dev](https://www.boot.dev/).
 
 ## how to use
 
