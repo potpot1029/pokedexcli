@@ -31,18 +31,18 @@ func startRepl(cfg *config) {
 
 		// process command
 		commandName := cleanUserInput[0]
+		args := []string{}
+		if len(cleanUserInput) > 1 {
+			args = cleanUserInput[1:]
+		}
+
 		command, ok := getCommands()[commandName]
 		if !ok {
 			fmt.Println("Unknown command")
 		} else {
 			callback := command.callback
 
-			arg1 := ""
-			if len(cleanUserInput) > 1 {
-				arg1 = cleanUserInput[1]
-			}
-
-			err := callback(cfg, arg1)
+			err := callback(cfg, args...)
 			if err != nil {
 				fmt.Printf("error running command: %v\n", err)
 			}
@@ -60,7 +60,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config, string) error
+	callback    func(*config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
