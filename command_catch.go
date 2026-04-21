@@ -30,6 +30,7 @@ func commandCatch(cfg *config, args ...string) error {
 	} else {
 		fmt.Printf("%s escaped!\n", pokemonName)
 	}
+	fmt.Println("you can now inspect the pokemon with the command!")
 
 	return nil
 }
