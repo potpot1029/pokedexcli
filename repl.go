@@ -4,11 +4,17 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
+	"strconv"
 	"strings"
 )
 
 func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
+	c := config{
+		Next:     baseURL + "/1",
+		Previous: "",
+	}
 
 	for {
 		fmt.Print("Pokedex > ")
@@ -28,15 +34,12 @@ func startRepl() {
 			fmt.Println("Unknown command")
 		} else {
 			callback := command.callback
-			err := callback()
+			err := callback(&c)
 			if err != nil {
-				fmt.Errorf("error running command: %v", err)
+				fmt.Printf("error running command: %v\n", err)
 			}
 		}
 	}
-}
-
-func processCommand(userInput []string) {
 }
 
 // split user's input based on whitespace
@@ -49,7 +52,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*config) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -64,6 +67,31 @@ func getCommands() map[string]cliCommand {
 			description: "Exit the Pokedex",
 			callback:    commandExit,
 		},
+		"map": {
+			name:        "map",
+			description: "Displays the names of next 20 location areas in the Pokemon world",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Displays the names of previous 20 location areas in the Pokemon world",
+			callback:    commandMapBack,
+		},
 	}
+}
 
+type config struct {
+	Next     string
+	Previous string
+}
+
+const baseURL = "https://pokeapi.co/api/v2/location-area"
+
+func getNextURL(url string, step int) string {
+	id, err := strconv.Atoi(path.Base(url))
+	if err != nil {
+		fmt.Println(err)
+	}
+	id = id + step
+	return fmt.Sprintf("%s/%d", baseURL, id)
 }
